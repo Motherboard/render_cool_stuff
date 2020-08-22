@@ -20,21 +20,6 @@ std::vector<my::Color> & MandelbrotRender::get_image() {
     return _img;
 }
 
-
-//template <typename T>
-//int converge_count(T c_r, T c_i, unsigned int max_iter) {
-//    T z_r(c_r), z_i(c_i);
-//    for (unsigned int count = 1; count < max_iter; count++) {
-//        T new_z_r = (z_r * z_r) - (z_i * z_i) + c_r;
-//        z_i = 2 * (z_r * z_i) + c_i;
-//        z_r = std::move(new_z_r);
-//        if ((z_r * z_r) + (z_i * z_i) > 4) {
-//            return count;
-//        }
-//    }
-//    return -1;
-//}
-
 int converge_count(std::complex<long double> c, unsigned int max_iter) {
     std::complex<long double> z(c);
     for (unsigned int count = 1; count < max_iter; count++) {
@@ -49,13 +34,14 @@ int converge_count(std::complex<long double> c, unsigned int max_iter) {
 
 
 void MandelbrotRender::render(unsigned int x_min, unsigned int y_min, unsigned int x_max, unsigned y_max) {
+double max_log = std::log(_max_iter);
 #pragma omp parallel
 {
     for (int y = y_min; y < y_max; y++) {
         #pragma omp for
         for (int x = x_min; x < x_max; x++) {
             if (_iterations[x + y * _width] > 0)
-                _img[x + y * _width] = my::rainbow(static_cast<double>(_iterations[x + y * _width]) / (_max_iter / 10));
+                _img[x + y * _width] = my::rainbow(std::log(static_cast<double>(_iterations[x + y * _width]))/max_log);
             else
                 _img[x + y * _width] = {0, 0, 0, 0};
         }
