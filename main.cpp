@@ -1,43 +1,17 @@
-#include <iostream>
-#include <gmpxx.h>
-#include <SFML/Graphics.hpp>
-#include <array>
-#include <math.h>
-#include <chrono>
-#include <limits>
+#include <memory>
+#include <complex>
+#include "app.h"
+#include "mandelbrotrender.h"
 
-constexpr unsigned int WIDTH = 640, HEIGHT = 480, MAX_ITERATIONS=1000;
-constexpr int STEP=-5;
+constexpr unsigned int WIDTH = 800, HEIGHT = 600;
 
-void color_faster(unsigned char data[], uint_fast32_t r, uint_fast32_t g, uint_fast32_t b, uint_fast32_t a=255) {
+/*void color_faster(unsigned char data[], uint_fast32_t r, uint_fast32_t g, uint_fast32_t b, uint_fast32_t a=255) {
     *(reinterpret_cast<uint_fast32_t *>(data)) = r | (g << 8) | (b << 16) | (a << 24);
 }
 
 void color(unsigned char data[], unsigned char r, unsigned char g, unsigned char b, unsigned char a=255) {
     data[0] = r; data[1] = g; data[2] = b; data[3] = a;
 }
-
-
-struct Color {
-  u_char r, g, b, a;
-};
-
-Color rainbow(double x) {
-    static constexpr double step = 1.0/6;
-    x -= std::floor(x);
-    if (x < 1 * step)
-        return {255, 0, static_cast<u_char>(255*x/step), 255};
-    if (x < 2 * step)
-        return {static_cast<u_char>(255 - 255.0/step*(x - (1 * step))), 0, 255, 255};
-    if (x < 3 * step)
-        return {0, static_cast<u_char>(255.0/step*(x - (2 * step))), 255, 255};
-    if (x < 4 * step)
-        return {0, 255, static_cast<u_char>(255 - 255.0/step*(x - (3 * step))), 255};
-    if (x < 5 * step)
-        return {static_cast<u_char>(255.0/step*(x - (4 * step))), 255, 0, 255};
-    return {255, static_cast<u_char>(255-255.0/step*(x - (5 * step))), 0, 255};
-}
-
 
 void rainbow(unsigned char *data, double x) {
     constexpr double step = 1.0/6.0;
@@ -68,8 +42,8 @@ std::array<sf::Uint8, WIDTH * HEIGHT * 4> circles(int offset) {
     }
     return data;
 }
-
-template <typename T>
+*/
+/*template <typename T>
 double converge_count(T c_r, T c_i) {
     T z_r(c_r), z_i(c_i);
     for (unsigned int count = 1; count < MAX_ITERATIONS; count++) {
@@ -81,7 +55,7 @@ double converge_count(T c_r, T c_i) {
         }
     }
     return -1;
-}
+}*/
 
 
 /*std::array<sf::Uint8, WIDTH * HEIGHT * 4> mandelbrot(mpq_class center_r, mpq_class center_i, mpz_class zoom) {
@@ -96,7 +70,7 @@ double converge_count(T c_r, T c_i) {
 }*/
 
 
-std::array<Color, WIDTH * HEIGHT> mandelbrot(long double center_r, long double center_i, long double zoom) {
+/*std::array<Color, WIDTH * HEIGHT> mandelbrot(long double center_r, long double center_i, long double zoom) {
     std::array<Color, WIDTH * HEIGHT> data;
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
@@ -125,90 +99,15 @@ std::array<sf::Uint8, WIDTH * HEIGHT * 4> mandelbrot(mpf_class center_r, mpf_cla
 }
 
 
+*/
 
-class App {
-public:
-    App() {
-        window.create(sf::VideoMode(WIDTH, HEIGHT), "My window");
-        texture.create(WIDTH, HEIGHT);
-        sprite.setTexture(texture, true);
-        window.setVerticalSyncEnabled(true);
-    }
-    void run() {
-        while (window.isOpen())
-        {
-            process_events();
-            frame_time += render_image_get_processing_time();
-            elapsed_frames++;
-            if (elapsed_frames % 60 == 0) {
-                std::cout << "FPS: " << 60000.0l / frame_time << std::endl;
-                frame_time = 0;
-                elapsed_frames = 0;
-            }
-        }
-    }
-private:
-    sf::RenderWindow window;
-    sf::Texture texture;
-    sf::Sprite sprite;
-    unsigned int elapsed_frames = 0;
-    unsigned long long frame_time = 0;
-    long double center_r{-std::exp(1l)/7}, center_i{-std::exp(1l)/20}, zoom{1e2};
-    unsigned long render_image_get_processing_time() {
-        // clear the window with black color
-        window.clear(sf::Color::Black);
-        // draw everything here...
-        auto start = std::chrono::high_resolution_clock::now();
-        texture.update(reinterpret_cast<u_char *>(mandelbrot(center_r, center_i, zoom).data()));
-        sprite.setTexture(texture);
-        window.draw(sprite);
-        auto end = std::chrono::high_resolution_clock::now();
-        // end the current frame
-        window.display();
-        return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    }
-    void process_events() {
-        sf::Event event;
-        bool processed_move = false;
-        while (window.pollEvent(event))
-        {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                window.close();
-            if (event.type == sf::Event::KeyPressed && !processed_move) {
-                processed_move = true;
-                switch (event.key.code) {
-                case sf::Keyboard::Up:
-                    center_i -= 10 / zoom;
-                    break;
-                case sf::Keyboard::Down:
-                    center_i += 10 / zoom;
-                    break;
-                case sf::Keyboard::Left:
-                    center_r -= 10 / zoom;
-                    break;
-                case sf::Keyboard::Right:
-                    center_r += 10 / zoom;
-                    break;
-                case sf::Keyboard::A:
-                    zoom *= 1.1;
-                    break;
-                case sf::Keyboard::Z:
-                    zoom *= 0.9;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-    }
-};
 
 
 
 int main()
 {
-    App app;
+    App app(WIDTH, HEIGHT);
+    app.set_render(std::make_unique<MandelbrotRender>(WIDTH, HEIGHT, 100, std::complex<long double>(0, 0)));
     app.run();
     return 0;
 }
