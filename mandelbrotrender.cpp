@@ -34,11 +34,9 @@ int converge_count(std::complex<long double> c, unsigned int max_iter) {
 
 
 void MandelbrotRender::render(unsigned int x_min, unsigned int y_min, unsigned int x_max, unsigned y_max) {
-double max_log = std::log(_max_iter);
-#pragma omp parallel
-{
+    double max_log = std::log(_max_iter);
+    #pragma omp parallel for collapse(2)
     for (int y = y_min; y < y_max; y++) {
-        #pragma omp for
         for (int x = x_min; x < x_max; x++) {
             if (_iterations[x + y * _width] > 0)
                 _img[x + y * _width] = my::rainbow(std::log(static_cast<double>(_iterations[x + y * _width]))/max_log);
@@ -48,15 +46,12 @@ double max_log = std::log(_max_iter);
 
     }
 }
-}
 
 
 
 void MandelbrotRender::compute_and_set_max_iterations(unsigned int x_min, unsigned int y_min, unsigned int x_max, unsigned y_max) {
-#pragma omp parallel
-{
+    #pragma omp parallel for collapse(2)
     for (int y = y_min; y < y_max; y++) {
-        #pragma omp for
         for (int x = x_min; x < x_max; x++) {
             int num_iterations = converge_count(
                         _center + std::complex<long double>(
@@ -65,9 +60,6 @@ void MandelbrotRender::compute_and_set_max_iterations(unsigned int x_min, unsign
             _iterations[x + y * _width] = num_iterations;
         }
     }
-
-}
-
 }
 
 
