@@ -71,7 +71,15 @@ void App::process_events() {
             case sf::Keyboard::Z:
                 _render_p->backward();
                 break;
+            case sf::Keyboard::Equal:
+                _render_p->more_iterations();
+                break;
+            case sf::Keyboard::Tilde:
+                _render_p->less_iterations();
+                std::cout << "less iters" << std::endl;
+                break;
             default:
+                std::cout << event.key.code << std::endl;
                 break;
             }
         }

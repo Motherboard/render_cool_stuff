@@ -24,6 +24,8 @@ public:
     virtual void right() = 0;
     virtual void up() = 0;
     virtual void down() = 0;
+    virtual void more_iterations() = 0;
+    virtual void less_iterations() = 0;
 };
 
 #endif // BASERENDER_H

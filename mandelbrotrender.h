@@ -3,7 +3,6 @@
 
 #include "baserender.h"
 #include <complex>
-#include <queue>
 
 
 struct IndexAndComplexPoint {
@@ -24,17 +23,18 @@ public:
     void right() final;
     void up() final;
     void down() final;
+    void more_iterations() final;
+    void less_iterations() final;
 private:
     unsigned int _width, _height, _max_iter;
     long double _zoom, _last_computed_zoom;
     std::complex<long double> _center;
     std::vector<my::Color> _img;
-    //std::vector<bool> _render_mask;
-    //std::vector<std::complex> _latest_values;
     std::vector<int> _iterations;
     std::vector<IndexAndComplexPoint> _indices_to_revisit;
     void render(unsigned int x_min, unsigned int y_min, unsigned int x_max, unsigned y_max);
-    void compute_and_set_max_iterations(unsigned int x_min, unsigned int y_min, unsigned int x_max, unsigned y_max);
+    void compute(unsigned int x_min, unsigned int y_min, unsigned int x_max, unsigned y_max);
+    void recompute_convergant(int recalc_threshold);
 };
 
 #endif // MANDELBROTRENDER_H

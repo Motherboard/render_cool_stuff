@@ -1,5 +1,5 @@
 #include "baserender.h"
-#include <math.h>
+#include <cmath>
 
 using u_char = unsigned char;
 
